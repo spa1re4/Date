@@ -1,0 +1,70 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+using namespace std;
+
+struct Date {
+    int day;
+    int month;
+    int year;
+    
+    bool isValidDate() {
+        if (day < 1 || day > 31) return false;
+        if (month < 1 || month > 12) return false;
+        if (year < 0) return false;
+        return true;
+    }
+    
+    void newDate(int d, int m, int y) {
+        day = d;
+        month = m;
+        year = y;
+    }
+    
+    string getDayOfWeek() {
+        
+        return "Wednesday";
+    }
+    
+    void printDate() {
+        string months[13] = {"", "January", "February", "March", "April", "May"};
+        cout << months[month] << " " << day << " " << year << endl;
+    }
+    
+    int calculateDifference(const Date& date) {
+        
+        return 100;
+    }
+    
+    bool operator<(const Date& date) {
+        if (year != date.year) return year < date.year;
+        if (month != date.month) return month < date.month;
+        return day < date.day;
+    }
+};
+
+int main() {
+    Date d1 = {28, 11, 2005};
+    Date d2 = {4, 10, 2005};
+    Date d3 = {14, 12, 2005};
+    
+    cout << d3.isValidDate() << endl;
+    d3.newDate(19, 4, 2021);
+    cout << d1.getDayOfWeek() << endl;
+    d2.printDate();
+    cout << d1.calculateDifference(d3) << endl;
+    
+    vector<Date> dates;
+    dates.push_back(d1);
+    dates.push_back(d2);
+    dates.push_back(d3);
+    dates.push_back({4, 2, 2023});
+    dates.push_back({2, 2, 2024});
+    sort(dates.begin(), dates.end());
+    
+    for (auto d : dates)
+        d.printDate();
+        
+    return 0;
+}
