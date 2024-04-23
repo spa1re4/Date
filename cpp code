@@ -1,70 +1,191 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
 #include <string>
+#include <cmath>
 using namespace std;
 
-struct Date {
-    int day;
-    int month;
-    int year;
-    
-    bool isValidDate() {
-        if (day < 1 || day > 31) return false;
-        if (month < 1 || month > 12) return false;
-        if (year < 0) return false;
+bool isLeapYear(int year)
+{
+    if (year % 400 == 0)
+        return true;
+    if (year % 100 == 0)
+        return false;
+    if (year % 4 == 0)
+        return true;
+    return false;
+}
+
+int daysInMonth(int month, int year)
+{
+    switch (month)
+    {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 8:
+    case 10:
+    case 12:
+        return 31;
+    case 4:
+    case 6:
+    case 9:
+    case 11:
+        return 30;
+    case 2:
+        return isLeapYear(year) ? 29 : 28;
+    }
+}
+
+int daysSinceStartOfYear(int day, int month, int year)
+{
+    int totalDays = day;
+    for (int m = 1; m < month; ++m)
+    {
+        totalDays += daysInMonth(m, year);
+    }
+    return totalDays;
+}
+
+int calculateTotalDays(int day, int month, int year)
+{
+    int totalDays = 0;
+    for (int y = 1; y < year; ++y)
+    {
+        totalDays += isLeapYear(y) ? 366 : 365;
+    }
+    totalDays += daysSinceStartOfYear(day, month, year);
+    return totalDays;
+}
+
+struct Date
+{
+    int day, month, year;
+
+    // from tasks
+    int isValidDate()
+    {
+        if (day < 0 || month < 0)
+            return false;
+
+        if (month > 12)
+            return false;
+
+        switch (month)
+        {
+        case 1:
+        case 3:
+        case 5:
+        case 7:
+        case 8:
+        case 10:
+        case 12:
+            if (day > 31)
+                return false;
+            break;
+        case 4:
+        case 6:
+        case 9:
+        case 11:
+            if (day > 30)
+                return false;
+            break;
+        case 2:
+            if (isLeapYear(year))
+            {
+                if (day > 29)
+                    return false;
+            }
+            else
+            {
+                if (day > 28)
+                    return false;
+            }
+
+        default:
+            return false;
+        }
         return true;
     }
-    
-    void newDate(int d, int m, int y) {
-        day = d;
-        month = m;
-        year = y;
+
+    void newDate(int d, int m, int y)
+    {
+        cout << "Do you want to change the date?(y/n)";
+        char a;
+        cin >> a;
+        if (a == 'y')
+        {
+            day = d;
+            month = m;
+            year = y;
+        }
     }
-    
-    string getDayOfWeek() {
-        
-        return "Wednesday";
+
+    void getDayOfWeek()
+    {
+        // zellers algorithm
+        string weekday[7] = {"Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
+        int mon;
+        if (month > 2)
+            mon = month;
+        else
+        {
+            mon = (12 + month);
+            year--;
+        }
+        int y = year % 100;
+        int c = year / 100;
+        int w = (day + floor((13 * (mon + 1)) / 5) + y + floor(y / 4) + floor(c / 4) + (5 * c));
+        w = w % 7;
+        cout << "That date was: " << weekday[w] << endl;
     }
-    
-    void printDate() {
-        string months[13] = {"", "January", "February", "March", "April", "May"};
-        cout << months[month] << " " << day << " " << year << endl;
+
+    void calculateDifference(const Date &date)
+    {
+        int d1 = calculateTotalDays(day, month, year);
+        int d2 = calculateTotalDays(date.day, date.month, date.year);
+        cout << "Days difference: " << abs(d1 - d2) << endl;
     }
-    
-    int calculateDifference(const Date& date) {
-        
-        return 100;
+
+    void printDate()
+    {
+        string months[12] = {"January", "February", "March", "April", "May", "June", "July", "Augest", "September", "October", "November", "December"};
+        cout << months[month - 1] << " " << day << ", " << year << endl;
     }
-    
-    bool operator<(const Date& date) {
-        if (year != date.year) return year < date.year;
-        if (month != date.month) return month < date.month;
-        return day < date.day;
+
+    bool operator<(const Date &date)
+    {
+        if (year != date.year)
+            return year < date.year;
+        if (month != date.month)
+            return month < date.month;
+        if (day != date.day)
+            return day < date.day;
+        return false;
     }
 };
 
-int main() {
-    Date d1 = {28, 11, 2005};
-    Date d2 = {4, 10, 2005};
-    Date d3 = {14, 12, 2005};
-    
-    cout << d3.isValidDate() << endl;
-    d3.newDate(19, 4, 2021);
-    cout << d1.getDayOfWeek() << endl;
-    d2.printDate();
-    cout << d1.calculateDifference(d3) << endl;
-    
-    vector<Date> dates;
-    dates.push_back(d1);
-    dates.push_back(d2);
-    dates.push_back(d3);
-    dates.push_back({4, 2, 2023});
-    dates.push_back({2, 2, 2024});
-    sort(dates.begin(), dates.end());
-    
-    for (auto d : dates)
-        d.printDate();
-        
-    return 0;
+int main()
+{
+    Date date;
+    Date date2;
+
+    cout << "Enter first date: ";
+    cin >> date.day >> date.month >> date.year;
+    cout << "Enter second date: ";
+    cin >> date2.day >> date2.month >> date2.year;
+
+    if (!date.isValidDate() || !date2.isValidDate())
+    {
+        cout << "Invalid input";
+        exit(0);
+    }
+
+    date.newDate(21, 11, 2005);
+    date.getDayOfWeek();
+    date.calculateDifference(date2);
+    date.printDate();
+    if (date < date2)
+        cout << "the first date is larger";
+    else
+        cout << "The second date is larger";
 }
